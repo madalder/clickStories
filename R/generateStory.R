@@ -183,7 +183,7 @@ format:
 ### {takeaway}
 
 ::: fragment
-                          {text}
+{text}
 :::
 :::
 
