@@ -1,12 +1,14 @@
 Package: clickStories
-Title: What the Package Does (One Line, Title Case)
+Title: Generate Quarto Reveal.js Click-Through Data Stories
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
 Encoding: UTF-8
+Authors@R: 
+    person("Madoc Alder", "Marshall", , "mmarshall@astho.org", role = c("aut", "cre"),
+           )
+Description: This package allows you to quickly create compelling click-through data stories using a variety of viz formats, from embedded HTML code, to local images. It generates a Quarto RevealJS document and necessary file directory and, if needed, can generate a self containeed html doc version of the click-through.
+License: `use_mit_license()`
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

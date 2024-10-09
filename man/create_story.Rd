@@ -2,53 +2,88 @@
 % Please edit documentation in R/generateStory.R
 \name{create_story}
 \alias{create_story}
-\title{Create a click through data story using Quarto revealjs}
+\title{Generate Quarto Reveal.js Click-Through Data Stories}
+\usage{
+create_story(
+  story_title,
+  output_dir = NULL,
+  name = "story",
+  logo = NULL,
+  style = NULL,
+  render_html = FALSE,
+  panels = NULL,
+  ...
+)
+}
 \arguments{
 \item{story_title}{The title of the presentation.}
 
-\item{logo}{The path to the logo image. If provided, it will be copied to the "images" directory.}
+\item{output_dir}{The file path where you want the directory folder and other relevant files to be placed.}
 
-\item{filename}{The filename for the generated Quarto \code{.qmd} document. Default is "story.qmd".}
+\item{name}{The file name you want to use for the generated directory folder and Quarto \code{.qmd} document. Default is "story".}
+
+\item{logo}{The path to the logo image. If provided, it will be copied to the "images" directory.}
 
 \item{style}{The path to a custom SCSS file for styling the presentation. If provided, it will be copied to the same directory as the \code{.qmd} file.}
 
-\item{...}{Panel definitions. Each panel is defined as a list containing:
-\item{name}{A keyword or two (hyphenated) to use as the panel's url when published.}
-\item{takeaway}{The larger takeaway sentence that appears first for each panel.}
-\item{text}{The additional text to provide context or explanations for the panel.}
-\item{vizType}{The type of visualization to include in the second column. Possible values: "embed" (for embedding HTML content), "image-link" (for an external image), "image" (for a local image).}
-\item{viz}{The content of the visualization. It can be an HTML embed code, a link to an external image, or the path to a local image.}
-\item{alt}{The alt text for the image or image-link, used for accessibility and image descriptions.}}
+\item{render_html}{Logical, if \code{TRUE}, the function will attempt to render the Quarto \code{.qmd} file into HTML after creation.}
+
+\item{panels}{An optional named argument to pass panel definitions as a list. If \code{panels} is \code{NULL}, panels are collected from \code{...}. Each panel is defined as a list containing:
+\describe{
+\item{name}{A keyword or two (hyphenated) to use as the panel's URL when published.}
+\item{takeaway}{The main takeaway sentence that appears first for each panel.}
+\item{text}{Additional text to provide context or explanations for the panel.}
+\item{vizType}{The type of visualization to include in the second column. Possible values: "embed" (for embedding HTML content), "image-link" (for an external image), "image" (for a local image). If \code{"image"}, the local image will be copied to the "images" directory within the generated folder.}
+\item{viz}{The content of the visualization. It can be an HTML embed code, a link to an external image, or the path to a local image. For local images, the function will automatically copy the file to the "images" folder within the output directory.}
+\item{alt}{The alt text for the image or image-link, used for accessibility and image descriptions.}
+}}
+
+\item{...}{Additional panel definitions, if \code{panels} is not used. The structure for each panel is the same as described under the \code{panels} argument.}
 }
 \value{
-Creates a Quarto \code{.qmd} file that can be used to render a Reveal.js presentation.
+A list containing:
+\describe{
+\item{qmd_file}{The file path to the generated Quarto \code{.qmd} file.}
+\item{html_file}{The file path to the generated HTML file (if \code{render_html = TRUE}), or \code{NULL} otherwise.}
+}
 }
 \description{
 This function generates a Quarto Reveal.js presentation with custom slides, including images, text, and visualizations.
-Each panel can have two columns, one for text and the other for a visualization, which could be an embedded HTML object, an external image, or a local image.
+Each panel can have two columns: one for text and the other for a visualization, which can be an embedded HTML object, an external image, or a local image.
+You can include custom SCSS themes to style the presentation further. You can also opt to create a self-contained HTML file version of the story.
 }
 \examples{
 create_story(
   story_title = "Data Story Title",
   logo = NULL,
-  filename = "story.qmd",
+  output_dir = ".",
+  name = "story",
   style = NULL,
-  list(name = "keyword1",
-    takeaway = "This is the Main Takeaway of the panel.",
-    text = "This is additional text that gives the reader additional context.",
-    vizType = "embed",
-    viz = '<div class="flourish-embed flourish-chart" data-src="visualisation/11597006"><script src="https://public.flourish.studio/resources/embed.js"></script></div>'),
-  list(name = "keyword2",
-    takeaway = "New panel, new main takeaway, summary sentence, etc.",
-    text = "This is more text that gives the reader additional context.",
-    vizType = "image-link",
-    viz = "https://www.naccho.org/uploads/body-images/public-health-101-infographic-no-logo.jpg",
-    alt = "This is the alt text description for the shared image link"),
-  list(name = "keyword3",
-    takeaway = "New panel, new main takeaway, summary sentence, etc.",
-    text = "This is more text that gives the reader additional context.",
-    vizType = "image",
-    viz = "images/test.png",
-    alt = "The alt text for the associated image.")
+  render_html = FALSE,
+  panels = list(
+    list(
+      name = "keyword1",
+      takeaway = "This is the Main Takeaway of the panel.",
+      text = "This is additional text that gives the reader additional context.",
+      vizType = "embed",
+      viz = '<div class="flourish-embed flourish-chart" data-src="visualisation/11597006"><script src="https://public.flourish.studio/resources/embed.js"></script></div>'
+    ),
+    list(
+      name = "keyword2",
+      takeaway = "New panel, new main takeaway, summary sentence, etc.",
+      text = "This is more text that gives the reader additional context.",
+      vizType = "image-link",
+      viz = "https://www.naccho.org/uploads/body-images/public-health-101-infographic-no-logo.jpg",
+      alt = "This is the alt text description for the shared image link"
+    ),
+    list(
+      name = "keyword3",
+      takeaway = "New panel, new main takeaway, summary sentence, etc.",
+      text = "This is more text that gives the reader additional context.",
+      vizType = "image",
+      viz = "images/test.png",
+      alt = "The alt text for the associated image."
+    )
+  )
 )
 }
