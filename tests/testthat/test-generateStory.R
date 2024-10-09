@@ -5,8 +5,11 @@ test_that("multiplication works", {
 
 test_that("create_story generates the expected .qmd file", {
 
+
   temp_dir <- "~/Documents"
   output_dir <- file.path(temp_dir, "test_story")
+
+  on.exit(unlink(output_dir, recursive = TRUE), add = TRUE)  # Cleanup after the test
 
   create_story(
     story_title = "Test Story",
@@ -51,6 +54,8 @@ test_that("create_story handles logo and style files correctly", {
   file.create(logo_path)
   file.create(style_path)
 
+  on.exit(unlink(output_dir, recursive = TRUE), add = TRUE)  # Cleanup after the test
+
   create_story(
     story_title = "Story with Logo and Style",
     output_dir = temp_dir,
@@ -85,6 +90,8 @@ test_that("create_story handles logo and style files correctly", {
 test_that("create_story handles missing panels gracefully", {
   temp_dir <- tempdir()
   output_dir <- file.path(temp_dir, "test_story_empty")
+
+  on.exit(unlink(output_dir, recursive = TRUE), add = TRUE)  # Cleanup after the test
 
   # Run function without panels (empty ...)
   create_story(
@@ -122,7 +129,7 @@ test_that("create_story handles local image copying", {
   temp_dir <- "~/Documents"
   output_dir <- file.path(temp_dir, "test_story_images")
 
-
+  on.exit(unlink(output_dir, recursive = TRUE), add = TRUE)  # Cleanup after the test
 
   create_story(
     story_title = "Story with Local Image",
