@@ -6,7 +6,7 @@ Authors@R:
     person("Madoc Alder", "Marshall", , "mmarshall@astho.org", role = c("aut", "cre"),
            )
 Description: This package allows you to quickly create compelling click-through data stories using a variety of viz formats, from embedded HTML code, to local images. It generates a Quarto RevealJS document and necessary file directory and, if needed, can generate a self containeed html doc version of the click-through.
-License: `use_mit_license()`
+License: MIT + file LICENSE
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
