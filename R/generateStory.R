@@ -242,7 +242,7 @@ format:
 
       # Generate slide content ---------
       slide_content <- glue("
-##  {{#{name} data-menu-title='{takeaway}'}}
+##  {{#{name} }}
 
 <br>
 
