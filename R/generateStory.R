@@ -29,6 +29,7 @@
 #'   }
 #'
 #' @examples
+#' \dontrun{
 #' create_story(
 #'   story_title = "Data Story Title",
 #'   logo = NULL,
@@ -42,7 +43,9 @@
 #'       takeaway = "This is the Main Takeaway of the panel.",
 #'       text = "This is additional text that gives the reader additional context.",
 #'       vizType = "embed",
-#'       viz = '<div class="flourish-embed flourish-chart" data-src="visualisation/11597006"><script src="https://public.flourish.studio/resources/embed.js"></script></div>'
+#'       viz = '<div class="flourish-embed flourish-chart"
+#'       data-src="visualisation/11597006"><script src=
+#'       "https://public.flourish.studio/resources/embed.js"></script></div>'
 #'     ),
 #'     list(
 #'       name = "keyword2",
@@ -62,6 +65,7 @@
 #'     )
 #'   )
 #' )
+#' }
 #' @import glue
 #' @import fs
 #' @import quarto
@@ -215,7 +219,7 @@ format:
 
       name <- panel$name  # keyword or two (must be hyphenated) to use as the panel's label when published
       takeaway <- panel$takeaway
-      text <- panel$text
+      text <- ifelse("text" %in% names(panel), panel$text, "")  # Default empty string for missing text
       vizType <- panel$vizType
       viz <- panel$viz
       alt <- ifelse(!is.null(panel$alt), panel$alt, "")  # Default empty string for alt text

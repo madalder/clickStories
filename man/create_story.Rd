@@ -53,6 +53,7 @@ Each panel can have two columns: one for text and the other for a visualization,
 You can include custom SCSS themes to style the presentation further. You can also opt to create a self-contained HTML file version of the story.
 }
 \examples{
+\dontrun{
 create_story(
   story_title = "Data Story Title",
   logo = NULL,
@@ -66,7 +67,9 @@ create_story(
       takeaway = "This is the Main Takeaway of the panel.",
       text = "This is additional text that gives the reader additional context.",
       vizType = "embed",
-      viz = '<div class="flourish-embed flourish-chart" data-src="visualisation/11597006"><script src="https://public.flourish.studio/resources/embed.js"></script></div>'
+      viz = '<div class="flourish-embed flourish-chart"
+      data-src="visualisation/11597006"><script src=
+      "https://public.flourish.studio/resources/embed.js"></script></div>'
     ),
     list(
       name = "keyword2",
@@ -86,4 +89,5 @@ create_story(
     )
   )
 )
+}
 }

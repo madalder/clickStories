@@ -159,3 +159,7 @@ test_that("create_story handles local image copying", {
   expect_true(any(grepl("(images/test.png)", content)))
 })
 
+# Clean up at the end of tests
+if (dir.exists("story")) {
+  unlink("story", recursive = TRUE)
+}
