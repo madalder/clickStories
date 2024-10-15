@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of clickStories is to ...
+The goal of clickStories is to streamline the process of developing click-through data storytelling products and to increase accessibility to those with less familiarity with programming in R and related languages.
 
 ## Installation
 
