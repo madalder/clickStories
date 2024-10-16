@@ -2,15 +2,20 @@
 % Please edit documentation in R/generatePanels.R
 \name{create_panels_list}
 \alias{create_panels_list}
-\title{Generate Panels from CSV/XLSX File with User Prompts for Column Mapping and Embed Support}
+\title{This function allows the user to generate a list of panels from a CSV or XLSX file.
+If the column names in the data file do not match the required fields, and the user hasn't provided \code{column_mappings},
+the function will prompt the user to input the correct column names using \code{readline()}.
+The function also supports various visualization types, transforming Figma embeds to the correct prototype format.}
 \usage{
-create_panels_list(data_file, col_mapping = NULL)
+create_panels_list(file, column_mappings = NULL)
 }
 \arguments{
-\item{data_file}{The path to the CSV or XLSX file that contains the panel data.}
+\item{file}{The path to the CSV or XLSX file that contains the panel data.}
 
-\item{col_mapping}{A named list or vector specifying the mapping from required field names
-to the column names in your data file. Defaults to the required field names.}
+\item{column_mappings}{A named list specifying the mapping from required field names to the column names in your data file.
+If \code{NULL} and the dataset's columns do not match the expected columns, the user will be prompted interactively.
+The list should have the following keys: 'name', 'takeaway', 'text', 'vizType', 'viz', and 'alt'.
+If the 'text' column is missing, you can set it to \code{NA_character_} to handle it as optional.}
 }
 \value{
 A list of panels, where each panel is a list containing:
@@ -19,22 +24,16 @@ A list of panels, where each panel is a list containing:
 \item{takeaway}{The main takeaway sentence for the panel.}
 \item{text}{Additional context or explanations for the panel. If empty or missing, it will be set to an empty string.}
 \item{vizType}{The type of visualization to include ("embed", "image-link", "image").}
-\item{viz}{The content of the visualization (embed code, external image link, or local image path). Figma design links are transformed to prototype links.}
+\item{viz}{The content of the visualization (embed code, external image link, or local image path). Figma design links
+are transformed to prototype links.}
 \item{alt}{Alt text for the visualization, for accessibility purposes.}
 }
 }
 \description{
 This function allows the user to generate a list of panels from a CSV or XLSX file.
-If the column names in the data file do not match the required fields, the function will prompt the user
-to input the correct column names. Additionally, the function supports various visualization types, transforming Figma embeds
-to the correct prototype format and handling other iframe-based embeds (e.g., YouTube, Google Maps) without altering them.
-}
-\details{
-This function reads data from a CSV or XLSX file and returns a list of panels
-to be used in creating a Quarto Reveal.js presentation. If the required column names
-don't match, it prompts the user to provide the correct column names. The function supports
-multiple visualization types, including Figma embeds, image links, and other iframe-based embeds.
-Figma design links are automatically converted to prototype links with the appropriate parameters.
+If the column names in the data file do not match the required fields, and the user hasn't provided \code{column_mappings},
+the function will prompt the user to input the correct column names using \code{readline()}.
+The function also supports various visualization types, transforming Figma embeds to the correct prototype format.
 }
 \examples{
 \dontrun{
@@ -42,8 +41,18 @@ Figma design links are automatically converted to prototype links with the appro
 # Assuming the CSV file has columns named 'name', 'takeaway', 'text', 'vizType', 'viz', 'alt'
 panels <- create_panels_list("path/to/your/file.csv")
 
-# Example 2: Handling Figma embeds and other viz types
-# The function transforms Figma design links to prototype format, while other embeds (YouTube, etc.) remain unchanged.
-panels <- create_panels_list("path/to/your/file.csv")
+# Example with a standard CSV file and no manual input (with automatic column mappings):
+panels <- create_panels_list('panels.csv', column_mappings = list(
+  name = 'panel_name',
+  takeaway = 'main_takeaway',
+  text = NA_character_,  # Optional column
+  vizType = 'viz_type',
+  viz = 'visualization',
+  alt = 'alt_text'
+))
+
+# Example with an XLSX file and interactive prompt (requires user input if columns are not standard):
+panels <- create_panels_list('panels.xlsx')
 }
+
 }

@@ -1,33 +1,28 @@
-#' Generate Panels from CSV/XLSX File with User Prompts for Column Mapping and Embed Support
 #'
-#' This function reads data from a CSV or XLSX file and returns a list of panels
-#' to be used in creating a Quarto Reveal.js presentation. If the required column names
-#' don't match, it prompts the user to provide the correct column names. The function supports
-#' multiple visualization types, including Figma embeds, image links, and other iframe-based embeds.
-#' Figma design links are automatically converted to prototype links with the appropriate parameters.
+#' This function allows the user to generate a list of panels from a CSV or XLSX file.
+#' If the column names in the data file do not match the required fields, and the user hasn't provided `column_mappings`,
+#' the function will prompt the user to input the correct column names using `readline()`.
+#' The function also supports various visualization types, transforming Figma embeds to the correct prototype format.
 #'
-#' @param data_file The path to the CSV or XLSX file that contains the panel data.
-#' @param col_mapping A named list or vector specifying the mapping from required field names
-#'   to the column names in your data file. Defaults to the required field names.
+#' @param file The path to the CSV or XLSX file that contains the panel data.
+#' @param column_mappings A named list specifying the mapping from required field names to the column names in your data file.
+#'        If `NULL` and the dataset's columns do not match the expected columns, the user will be prompted interactively.
+#'        The list should have the following keys: 'name', 'takeaway', 'text', 'vizType', 'viz', and 'alt'.
+#'        If the 'text' column is missing, you can set it to `NA_character_` to handle it as optional.
 #'
 #' @return A list of panels, where each panel is a list containing:
-#'   \describe{
-#'     \item{name}{The panel's name.}
-#'     \item{takeaway}{The main takeaway sentence for the panel.}
-#'     \item{text}{Additional context or explanations for the panel. If empty or missing, it will be set to an empty string.}
-#'     \item{vizType}{The type of visualization to include ("embed", "image-link", "image").}
-#'     \item{viz}{The content of the visualization (embed code, external image link, or local image path). Figma design links are transformed to prototype links.}
-#'     \item{alt}{Alt text for the visualization, for accessibility purposes.}
-#'   }
+#' \describe{
+#'   \item{name}{The panel's name.}
+#'   \item{takeaway}{The main takeaway sentence for the panel.}
+#'   \item{text}{Additional context or explanations for the panel. If empty or missing, it will be set to an empty string.}
+#'   \item{vizType}{The type of visualization to include ("embed", "image-link", "image").}
+#'   \item{viz}{The content of the visualization (embed code, external image link, or local image path). Figma design links
+#'              are transformed to prototype links.}
+#'   \item{alt}{Alt text for the visualization, for accessibility purposes.}
+#' }
 #'
-#' @import readr
-#' @import readxl
-#' @export
-#'
-#' @description This function allows the user to generate a list of panels from a CSV or XLSX file.
-#' If the column names in the data file do not match the required fields, the function will prompt the user
-#' to input the correct column names. Additionally, the function supports various visualization types, transforming Figma embeds
-#' to the correct prototype format and handling other iframe-based embeds (e.g., YouTube, Google Maps) without altering them.
+#' @importFrom tools file_ext
+#' @importFrom readxl read_xlsx
 #'
 #' @examples
 #' \dontrun{
@@ -35,81 +30,82 @@
 #' # Assuming the CSV file has columns named 'name', 'takeaway', 'text', 'vizType', 'viz', 'alt'
 #' panels <- create_panels_list("path/to/your/file.csv")
 #'
-#' # Example 2: Handling Figma embeds and other viz types
-#' # The function transforms Figma design links to prototype format, while other embeds (YouTube, etc.) remain unchanged.
-#' panels <- create_panels_list("path/to/your/file.csv")
+#' # Example with a standard CSV file and no manual input (with automatic column mappings):
+#' panels <- create_panels_list('panels.csv', column_mappings = list(
+#'   name = 'panel_name',
+#'   takeaway = 'main_takeaway',
+#'   text = NA_character_,  # Optional column
+#'   vizType = 'viz_type',
+#'   viz = 'visualization',
+#'   alt = 'alt_text'
+#' ))
+#'
+#' # Example with an XLSX file and interactive prompt (requires user input if columns are not standard):
+#' panels <- create_panels_list('panels.xlsx')
 #' }
+#'
+#' @export
 
+create_panels_list <- function(file, column_mappings = NULL) {
 
-create_panels_list <- function(data_file, col_mapping = NULL) {
+  expected_columns <- c("name", "takeaway", "text", "vizType", "viz", "alt")
 
-  # Required fields for panels
-  required_fields <- c("name", "takeaway", "text", "vizType", "viz", "alt")
-
-  # Automatically detect the file type based on the file extension
-  file_extension <- tools::file_ext(data_file)
+  # Extract the file extension
+  file_extension <- tools::file_ext(file)
 
   # Read the data based on the file extension
   if (tolower(file_extension) == "csv") {
-    panel_data <- read_csv(data_file)
+    panel_data <- read.csv(file)
   } else if (tolower(file_extension) == "xlsx") {
-    panel_data <- read_xlsx(data_file)
+    panel_data <- readxl::read_xlsx(file)
   } else {
     stop("Unsupported file type. Please provide a CSV or XLSX file.")
   }
 
-  # Extract the column names from the data
-  data_columns <- colnames(panel_data)
+  # Check if column_mappings are provided or not
+  if (is.null(column_mappings)) {
+    # Check if the dataset's columns match the expected columns
+    dataset_columns <- colnames(panel_data)
+    missing_columns <- setdiff(expected_columns, dataset_columns)
 
-  # Set default column mapping if not provided
-  if (is.null(col_mapping)) {
-    col_mapping <- required_fields
-    names(col_mapping) <- required_fields
-  }
-
-  # Prompt the user for missing or incorrect mappings
-  for (field in required_fields) {
-    if (!col_mapping[field] %in% data_columns) {
-      message(glue::glue("The column for '{field}' was not found in the file."))
-      col_mapping[field] <- readline(prompt = glue::glue("Please provide the column name for '{field}': "))
+    # If columns don't match, prompt the user
+    if (length(missing_columns) > 0) {
+      column_mappings <- list(
+        name = readline("Please provide the column name for 'name': "),
+        takeaway = readline("Please provide the column name for 'takeaway': "),
+        vizType = readline("Please provide the column name for 'vizType': "),
+        viz = readline("Please provide the column name for 'viz': "),
+        alt = readline("Please provide the column name for 'alt': "),
+        text = readline("Please provide the column name for 'text': ")
+      )
+    } else {
+      # If columns match, use the dataset column names directly
+      column_mappings <- as.list(setNames(dataset_columns, expected_columns))
     }
   }
 
-  # Ensure that the provided columns exist in the data file
-  missing_columns <- setdiff(col_mapping, colnames(panel_data))
-  if (length(missing_columns) > 0) {
-    stop(glue::glue("The following columns are missing from the data file: {paste(missing_columns, collapse = ', ')}"))
+  # Handle missing 'text' column by checking its existence in the column_mappings
+  if (!"text" %in% names(column_mappings) || is.na(column_mappings$text)) {
+    column_mappings$text <- NULL
   }
 
-
-  # Create panels from the data file, handling empty text fields
-  panels <- lapply(seq_len(nrow(panel_data)), function(i) {
-    panel <- list(
-      name = panel_data[[ col_mapping["name"] ]][i],
-      takeaway = panel_data[[ col_mapping["takeaway"] ]][i],
-      text = ifelse(is.na(panel_data[[ col_mapping["text"] ]][i]) || panel_data[[ col_mapping["text"] ]][i] == "", "", panel_data[[ col_mapping["text"] ]][i]),  # Handle blank text
-      vizType = panel_data[[ col_mapping["vizType"] ]][i],
-      viz = if (panel_data[[col_mapping["vizType"]]][i] == "embed") {
-        # Apply Figma transformation if the viz content is an embed
-        transform_figma_embed(panel_data[[col_mapping["viz"]]][i])
-      } else {
-        # For other viz types, keep the original content
-        panel_data[[col_mapping["viz"]]][i]
-      },
-      alt = panel_data[[ col_mapping["alt"] ]][i]
+  # Create the panels list based on the detected or provided column mappings
+  panels <- lapply(1:nrow(panel_data), function(i) {
+    list(
+      name = panel_data[[column_mappings$name]][i],
+      takeaway = panel_data[[column_mappings$takeaway]][i],
+      text = if (!is.null(column_mappings$text)) panel_data[[column_mappings$text]][i] else NULL,
+      vizType = panel_data[[column_mappings$vizType]][i],
+      viz = panel_data[[column_mappings$viz]][i],
+      alt = panel_data[[column_mappings$alt]][i]
     )
-
-    # Validate that the panel contains all the required fields
-    if (!all(c("takeaway", "text", "vizType", "viz") %in% names(panel))) {
-      stop(glue::glue("Panel {panel$name} is missing one of the required fields: 'takeaway', 'text', 'vizType', 'viz'."))
-    }
-
-    return(panel)
   })
 
-  # Return the panels list
   return(panels)
 }
+
+
+
 
 #' Transform Figma Embed URL to Prototype Format
 #'

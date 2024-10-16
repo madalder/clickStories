@@ -2,10 +2,7 @@ test_that("multiplication works", {
   expect_equal(2 * 2, 4)
 })
 
-
 test_that("create_story generates the expected .qmd file", {
-
-
   temp_dir <- "~/Documents"
   output_dir <- file.path(temp_dir, "test_story")
 
@@ -17,13 +14,14 @@ test_that("create_story generates the expected .qmd file", {
     name = "test_story",
     render_html = FALSE,
     panels = list(
-      list(name = "test-panel",
-      takeaway = "Test takeaway",
-      text = "Test text for the panel.",
-      vizType = "image",
-      viz = "~/Documents/test.png",
-      alt = ""
-    )
+      list(
+        name = "test-panel",
+        takeaway = "Test takeaway",
+        text = "Test text for the panel.",
+        vizType = "image",
+        viz = "~/Documents/test.png",
+        alt = ""
+      )
     )
   )
 
@@ -42,6 +40,40 @@ test_that("create_story generates the expected .qmd file", {
   expect_true(any(grepl("images/test.png", content)))  # Checks for embedded viz
 })
 
+
+test_that("create_story handles missing text field gracefully", {
+  temp_dir <- "~/Documents"
+  output_dir <- file.path(temp_dir, "test_story_no_text")
+
+  on.exit(unlink(output_dir, recursive = TRUE), add = TRUE)  # Cleanup after the test
+
+  create_story(
+    story_title = "Story without Text",
+    output_dir = temp_dir,
+    name = "test_story_no_text",
+    render_html = FALSE,
+    panels = list(
+      list(
+        name = "panel1",
+        takeaway = "Takeaway 1",
+        vizType = "image",
+        viz = "~/Documents/test.png",
+        alt = "Image without text"
+      )
+    )
+  )
+
+  qmd_file <- file.path(output_dir, "test_story_no_text.qmd")
+  expect_true(file.exists(qmd_file))
+
+  # Read the file content
+  content <- readLines(qmd_file)
+
+  # Check that the panel was generated without the text section
+  expect_true(any(grepl("Takeaway 1", content)))  # Checks for correct takeaway
+  expect_false(any(grepl("Text 1", content)))  # Ensure no text is present
+  expect_true(any(grepl("images/test.png", content)))  # Ensure image is embedded
+})
 
 
 test_that("create_story handles logo and style files correctly", {
@@ -64,14 +96,14 @@ test_that("create_story handles logo and style files correctly", {
     style = style_path,
     render_html = FALSE,
     panels = list(
-    list(
-      name = "panel1",
-      takeaway = "Takeaway 1",
-      text = "Text 1",
-      vizType = "image",
-      viz = logo_path,
-      alt = "Logo image alt text"
-    )
+      list(
+        name = "panel1",
+        takeaway = "Takeaway 1",
+        text = "Text 1",
+        vizType = "image",
+        viz = logo_path,
+        alt = "Logo image alt text"
+      )
     )
   )
 
@@ -79,7 +111,6 @@ test_that("create_story handles logo and style files correctly", {
   expect_true(file.exists(qmd_file))
 
   content <- readLines(qmd_file)
-
 
   # Check that the logo and style paths are correctly added to the YAML header
   expect_true(any(grepl("logo: 'images/logo.png'", content)))  # Matches logo
@@ -112,6 +143,7 @@ test_that("create_story handles missing panels gracefully", {
   expect_false(any(grepl("##", content)))
 })
 
+
 test_that("create_story handles invalid panel input", {
   temp_dir <- tempdir()
 
@@ -119,8 +151,8 @@ test_that("create_story handles invalid panel input", {
     story_title = "Invalid Panel Test",
     output_dir = temp_dir,
     render_html = FALSE,
-    list(name = "panel1", takeaway = "Takeaway 1", text = "Text 1"),  # Missing vizType and viz
-    "All panels must be lists with 'name', 'takeaway', 'text', 'vizType', and 'viz'"
+    panels = list(list(name = "panel1", takeaway = "Takeaway 1", text = "Text 1")),  # Missing vizType and viz
+    "All panels must be lists with 'name', 'takeaway', 'vizType', and 'viz'"
   ))
 })
 
@@ -137,14 +169,14 @@ test_that("create_story handles local image copying", {
     name = "test_story_images",
     render_html = FALSE,
     panels = list(
-    list(
-      name = "panel1",
-      takeaway = "Takeaway 1",
-      text = "Text 1",
-      vizType = "image",
-      viz = "~/Documents/test.png",
-      alt = "Local image alt text"
-    )
+      list(
+        name = "panel1",
+        takeaway = "Takeaway 1",
+        text = "Text 1",
+        vizType = "image",
+        viz = "~/Documents/test.png",
+        alt = "Local image alt text"
+      )
     )
   )
 

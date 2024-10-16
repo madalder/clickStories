@@ -80,10 +80,12 @@ create_story <- function(story_title, subtitle = NULL, output_dir = NULL, name =
     panels <- list(...)
   }
 
-  # Ensure that each panel is a list and contains required fields ---------
+  # Ensure that each panel is a list and contains required fields (excluding 'text' which is optional) ---------
+  required_fields <- c("name", "takeaway", "vizType", "viz")
+
   if (!all(sapply(panels, function(panel) is.list(panel) &&
-                  all(c("name", "takeaway", "text", "vizType", "viz") %in% names(panel))))) {
-    stop("All panels must be lists with 'name', 'takeaway', 'text', 'vizType', and 'viz'.")
+                  all(required_fields %in% names(panel))))) {
+    stop("All panels must be lists with 'name', 'takeaway', 'vizType', and 'viz'. 'text' is optional.")
   }
 
   # Ensure panel names are unique ----------
@@ -206,7 +208,12 @@ format:
 
       name <- panel$name
       takeaway <- panel$takeaway
-      text <- ifelse("text" %in% names(panel), panel$text, "")
+      text_content <- if ("text" %in% names(panel) && !is.na(panel$text) && panel$text != "") {
+        glue("\n\n::: fragment\n{panel$text}\n:::\n")
+      } else {
+        NULL  # Skip if 'text' is missing, empty, or NA
+      }
+
       vizType <- panel$vizType
       viz <- panel$viz
       alt <- ifelse(!is.null(panel$alt), panel$alt, "")
@@ -223,7 +230,13 @@ format:
         viz_content <- glue('![]({file.path("images", basename(viz))}){{fig-alt="{alt}"}}')
       }
 
-      # Generate slide content
+      # Build the left column content (takeaway and text) conditionally
+      left_column_content <- glue("### {takeaway}\n")
+      if (!is.null(text_content)) {
+        left_column_content <- paste0(left_column_content, text_content)
+      }
+
+      # Generate slide content with conditional inclusion of text_content
       slide_content <- glue("
 ##  {{#{name} }}
 
@@ -232,11 +245,7 @@ format:
 :::columns
 
 :::{{.column width=45%}}
-### {takeaway}
-
-::: fragment
-{text}
-:::
+{left_column_content}
 :::
 
 :::{{.column .fragment width=55%}}
@@ -251,6 +260,7 @@ format:
       content <- paste0(content, slide_content)
     }
   }
+
 
   # Write the content to the Quarto .qmd file in the target directory ---------
   output_file <- file.path(target_dir, filename)
