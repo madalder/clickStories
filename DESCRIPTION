@@ -1,6 +1,6 @@
 Package: clickStories
 Title: Generate Quarto Reveal.js Click-Through Data Stories
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Encoding: UTF-8
 Authors@R: 
     person("Madoc Alder", "Marshall", , "mmarshall@astho.org", role = c("aut", "cre"),
