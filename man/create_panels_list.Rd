@@ -2,7 +2,7 @@
 % Please edit documentation in R/generatePanels.R
 \name{create_panels_list}
 \alias{create_panels_list}
-\title{Generate Panels from CSV/XLSX File with User Prompts for Column Mapping}
+\title{Generate Panels from CSV/XLSX File with User Prompts for Column Mapping and Embed Support}
 \usage{
 create_panels_list(data_file, col_mapping = NULL)
 }
@@ -18,20 +18,23 @@ A list of panels, where each panel is a list containing:
 \item{name}{The panel's name.}
 \item{takeaway}{The main takeaway sentence for the panel.}
 \item{text}{Additional context or explanations for the panel. If empty or missing, it will be set to an empty string.}
-\item{vizType}{The type of visualization to include ("embed", "image-link", or "image").}
-\item{viz}{The content of the visualization (embed code, external image link, or local image path).}
+\item{vizType}{The type of visualization to include ("embed", "image-link", "image").}
+\item{viz}{The content of the visualization (embed code, external image link, or local image path). Figma design links are transformed to prototype links.}
 \item{alt}{Alt text for the visualization, for accessibility purposes.}
 }
 }
 \description{
 This function allows the user to generate a list of panels from a CSV or XLSX file.
-If the column names in the data file do not match the required fields, the function will
-prompt the user to input the correct column names.
+If the column names in the data file do not match the required fields, the function will prompt the user
+to input the correct column names. Additionally, the function supports various visualization types, transforming Figma embeds
+to the correct prototype format and handling other iframe-based embeds (e.g., YouTube, Google Maps) without altering them.
 }
 \details{
 This function reads data from a CSV or XLSX file and returns a list of panels
-to be used in creating a Quarto Reveal.js presentation.
-If the required column names don't match, it prompts the user to provide the correct column names.
+to be used in creating a Quarto Reveal.js presentation. If the required column names
+don't match, it prompts the user to provide the correct column names. The function supports
+multiple visualization types, including Figma embeds, image links, and other iframe-based embeds.
+Figma design links are automatically converted to prototype links with the appropriate parameters.
 }
 \examples{
 \dontrun{
@@ -39,43 +42,8 @@ If the required column names don't match, it prompts the user to provide the cor
 # Assuming the CSV file has columns named 'name', 'takeaway', 'text', 'vizType', 'viz', 'alt'
 panels <- create_panels_list("path/to/your/file.csv")
 
-# Now you can use 'panels' in the create_story function
-clickStories::create_story(
-  story_title = "Your Story Title",
-  output_dir = "path/to/output/dir",
-  name = "story_name",
-  logo = "path/to/logo.png",
-  style = "path/to/style.scss",
-  panels = panels
-)
-
-# Example 2: When the column names don't match and you are prompted to provide the correct ones
-# Assuming the CSV file has columns: 'panel_id', 'main_point', 'description',
- 'vis_type', 'vis_content', 'alt_description'
-# The function will prompt for the correct mappings
+# Example 2: Handling Figma embeds and other viz types
+# The function transforms Figma design links to prototype format, while other embeds (YouTube, etc.) remain unchanged.
 panels <- create_panels_list("path/to/your/file.csv")
-# You will be prompted for each field (e.g., "Please provide the column name for 'name': panel_id")
-
-# Example 3: Providing a column mapping directly without prompts
-col_mapping <- c(
-  name = "panel_id",
-  takeaway = "main_point",
-  text = "description",
-  vizType = "vis_type",
-  viz = "vis_content",
-  alt = "alt_description"
-)
-
-panels <- create_panels_list("path/to/your/file.csv", col_mapping = col_mapping)
-
-# You can now pass 'panels' to the create_story function as usual
-clickStories::create_story(
-  story_title = "Your Story Title",
-  output_dir = "path/to/output/dir",
-  name = "story_name",
-  logo = "path/to/logo.png",
-  style = "path/to/style.scss",
-  panels = panels
-)
 }
 }

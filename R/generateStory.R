@@ -6,6 +6,7 @@
 #'
 #' @name create_story
 #' @param story_title The title of the presentation.
+#' @param subtitle The subtitle of the presentation (optional).
 #' @param output_dir The file path where you want the directory folder and other relevant files to be placed.
 #' @param logo The path to the logo image. If provided, it will be copied to the "images" directory.
 #' @param name The file name you want to use for the generated directory folder and Quarto `.qmd` document. Default is "story".
@@ -32,6 +33,7 @@
 #' \dontrun{
 #' create_story(
 #'   story_title = "Data Story Title",
+#'   subtitle = "A Subtitle for the Story",
 #'   logo = NULL,
 #'   output_dir = ".",
 #'   name = "story",
@@ -71,21 +73,12 @@
 #' @import quarto
 #' @export
 
-
-create_story <- function(story_title, output_dir = NULL, name = "story", logo = NULL, style = NULL, render_html = FALSE, panels = NULL, ...) {
-
+create_story <- function(story_title, subtitle = NULL, output_dir = NULL, name = "story", logo = NULL, style = NULL, render_html = FALSE, panels = NULL, ...) {
 
   # If panels are not provided as a named argument, collect from ... ---------
   if (is.null(panels)) {
     panels <- list(...)
   }
-
-  # Debugging: Print out the panels passed to the function---------
-  # message("panels:")
-  # print(panels)
-  #
-  # message("panels length:")
-  # print(length(panels))
 
   # Ensure that each panel is a list and contains required fields ---------
   if (!all(sapply(panels, function(panel) is.list(panel) &&
@@ -120,10 +113,6 @@ create_story <- function(story_title, output_dir = NULL, name = "story", logo = 
   images_dir <- file.path(target_dir, "images")
   dir_create(images_dir)
 
-  # Debugging: Print out the logo passed ---------
-  # message("logo:")
-  # print(logo)
-
   # If logo is provided, copy it to the images directory ---------
   if (!is.null(logo) && length(logo) == 1 && logo != "" && file_exists(as.character(logo))) {
     file_copy(logo, file.path(images_dir, "logo.png"), overwrite = TRUE)
@@ -131,10 +120,6 @@ create_story <- function(story_title, output_dir = NULL, name = "story", logo = 
   } else {
     logo <- ""  # No logo if not provided or invalid
   }
-
-  # Debugging: Print the length of the logo to verify handling ---------
-  # message("logo length:")
-  # print(length(logo))
 
   # If style is provided, copy it to the target directory ---------
   if (!is.null(style) && length(style) == 1 && file_exists(as.character(style))) {
@@ -157,6 +142,7 @@ create_story <- function(story_title, output_dir = NULL, name = "story", logo = 
     glue("
 ---
 title: '{story_title}'
+subtitle: '{subtitle}'
 logo: '{logo}'
 engine: knitr
 format:
@@ -176,13 +162,14 @@ format:
     self-contained: {self_contained}
 ---
 
-", story_title = story_title, logo = logo, style = style, self_contained = self_contained)
+", story_title = story_title, subtitle = subtitle %||% "", logo = logo, style = style, self_contained = self_contained)
 
   } else {
 
     glue("
 ---
 title: '{story_title}'
+subtitle: '{subtitle}'
 logo: '{logo}'
 engine: knitr
 format:
@@ -202,14 +189,14 @@ format:
     self-contained: {self_contained}
 ---
 
-", story_title = story_title, logo = logo, self_contained = self_contained)
+", story_title = story_title, subtitle = subtitle %||% "", logo = logo, self_contained = self_contained)
 
   }
 
   # Initialize the content with the YAML header ---------
   content <- as.character(yaml_header)
 
-  # Debugging: Check if panels are processed correctly ---------
+  # Process the panels and generate the content ---------
   if (length(panels) == 0) {
     message("No panels provided.")
   } else {
@@ -217,30 +204,26 @@ format:
       panel <- panels[[i]]
       message(glue("Processing panel: {panel$name}"))
 
-      name <- panel$name  # keyword or two (must be hyphenated) to use as the panel's label when published
+      name <- panel$name
       takeaway <- panel$takeaway
-      text <- ifelse("text" %in% names(panel), panel$text, "")  # Default empty string for missing text
+      text <- ifelse("text" %in% names(panel), panel$text, "")
       vizType <- panel$vizType
       viz <- panel$viz
-      alt <- ifelse(!is.null(panel$alt), panel$alt, "")  # Default empty string for alt text
+      alt <- ifelse(!is.null(panel$alt), panel$alt, "")
 
       # Handle different visualization types
       viz_content <- ""
       if (vizType == "embed") {
-        # Embedding HTML content directly
         viz_content <- glue("{viz}")
-
       } else if (vizType == "image-link") {
-        # External image link
         viz_content <- glue('<img src="{viz}" alt="{alt}" />')
-
       } else if (vizType == "image" && !is.null(viz) && length(viz) == 1 && viz != "" && file_exists(as.character(viz))) {
         local_image_path <- file.path(images_dir, basename(viz))
         file_copy(viz, local_image_path, overwrite = TRUE)
         viz_content <- glue('![]({file.path("images", basename(viz))}){{fig-alt="{alt}"}}')
       }
 
-      # Generate slide content ---------
+      # Generate slide content
       slide_content <- glue("
 ##  {{#{name} }}
 
@@ -264,11 +247,7 @@ format:
 
 ")
 
-      # Debugging: Check generated slide content ---------
-      # message("Generated slide content:")
-      # print(slide_content)
-
-      # Append the generated slide content to the overall content ---------
+      # Append the generated slide content to the overall content
       content <- paste0(content, slide_content)
     }
   }
@@ -278,7 +257,7 @@ format:
   writeLines(content, con = output_file)
   message(glue("Story created: {output_file}"))
 
-  # If render_html is TRUE, render the .qmd file to HTML using CLI or cleanly ---------
+  # If render_html is TRUE, render the .qmd file to HTML using CLI ---------
   if (render_html) {
     result <- try(system(glue::glue("quarto render {output_file} --to html --self-contained"), intern = TRUE))
     if (inherits(result, "try-error")) {
@@ -288,7 +267,7 @@ format:
     }
   }
 
-  # Return the paths of the created files ---------
+  # Return the paths of the created files
   return(list(
     qmd_file = output_file,
     html_file = if (render_html) file.path(target_dir, paste0(name, ".html")) else NULL

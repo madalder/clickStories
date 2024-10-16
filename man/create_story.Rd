@@ -6,6 +6,7 @@
 \usage{
 create_story(
   story_title,
+  subtitle = NULL,
   output_dir = NULL,
   name = "story",
   logo = NULL,
@@ -17,6 +18,8 @@ create_story(
 }
 \arguments{
 \item{story_title}{The title of the presentation.}
+
+\item{subtitle}{The subtitle of the presentation (optional).}
 
 \item{output_dir}{The file path where you want the directory folder and other relevant files to be placed.}
 
@@ -56,6 +59,7 @@ You can include custom SCSS themes to style the presentation further. You can al
 \dontrun{
 create_story(
   story_title = "Data Story Title",
+  subtitle = "A Subtitle for the Story",
   logo = NULL,
   output_dir = ".",
   name = "story",
