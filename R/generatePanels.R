@@ -23,6 +23,8 @@
 #'
 #' @importFrom tools file_ext
 #' @importFrom readxl read_xlsx
+#' @importFrom stats setNames
+#' @importFrom utils read.csv
 #'
 #' @examples
 #' \dontrun{
@@ -40,7 +42,8 @@
 #'   alt = 'alt_text'
 #' ))
 #'
-#' # Example with an XLSX file and interactive prompt (requires user input if columns are not standard):
+#' # Example with an XLSX file and interactive prompt
+#' (requires user input if columns are not standard):
 #' panels <- create_panels_list('panels.xlsx')
 #' }
 #'
@@ -120,7 +123,11 @@ create_panels_list <- function(file, column_mappings = NULL) {
 #' @keywords internal
 #' @examples
 #' \dontrun{
-#' figma_embed <- '<iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="800" height="450" src="https://embed.figma.com/design/3BByo3UqianyYN2GaDmePf/Profile-Data-Stories---Brand-Colors?node-id=38-1173&embed-host=share" allowfullscreen></iframe>'
+#' figma_embed <- '<iframe style="border: 1px solid rgba(0, 0, 0, 0.1);"
+#' width="800" height="450" src=
+#' "https://embed.figma.com/design/3BByo3UqianyYN2GaDmePf/Profile-Data-Stories---
+#' Brand-Colors?node-id=38-1173&embed-host=share"
+#' allowfullscreen></iframe>'
 #' transformed_embed <- transform_figma_embed(figma_embed)
 #' }
 #'

@@ -21,7 +21,11 @@ and \code{show-proto-sidebar} are adjusted or added as necessary.
 }
 \examples{
 \dontrun{
-figma_embed <- '<iframe style="border: 1px solid rgba(0, 0, 0, 0.1);" width="800" height="450" src="https://embed.figma.com/design/3BByo3UqianyYN2GaDmePf/Profile-Data-Stories---Brand-Colors?node-id=38-1173&embed-host=share" allowfullscreen></iframe>'
+figma_embed <- '<iframe style="border: 1px solid rgba(0, 0, 0, 0.1);"
+width="800" height="450" src=
+"https://embed.figma.com/design/3BByo3UqianyYN2GaDmePf/Profile-Data-Stories---
+Brand-Colors?node-id=38-1173&embed-host=share"
+allowfullscreen></iframe>'
 transformed_embed <- transform_figma_embed(figma_embed)
 }
 

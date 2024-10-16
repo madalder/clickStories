@@ -51,7 +51,8 @@ panels <- create_panels_list('panels.csv', column_mappings = list(
   alt = 'alt_text'
 ))
 
-# Example with an XLSX file and interactive prompt (requires user input if columns are not standard):
+# Example with an XLSX file and interactive prompt
+(requires user input if columns are not standard):
 panels <- create_panels_list('panels.xlsx')
 }
 

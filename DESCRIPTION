@@ -16,5 +16,4 @@ Imports:
     fs,
     glue,
     quarto,
-    readr,
     readxl
