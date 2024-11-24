@@ -2,37 +2,50 @@
 % Please edit documentation in R/generatePanels.R
 \name{create_panels_list}
 \alias{create_panels_list}
-\title{This function allows the user to generate a list of panels from a CSV or XLSX file.
-If the column names in the data file do not match the required fields, and the user hasn't provided \code{column_mappings},
-the function will prompt the user to input the correct column names using \code{readline()}.
-The function also supports various visualization types, transforming Figma embeds to the correct prototype format.}
+\title{Generate Panels List from a Data File}
 \usage{
-create_panels_list(file, column_mappings = NULL)
+create_panels_list(
+  file,
+  column_mappings = NULL,
+  default_width = "100\%",
+  default_height_vertical = "850px",
+  default_height_similar = "650px",
+  default_height_horizontal = "600px"
+)
 }
 \arguments{
-\item{file}{The path to the CSV or XLSX file that contains the panel data.}
+\item{file}{Character. The path to the CSV or XLSX file that contains the panel data.}
 
-\item{column_mappings}{A named list specifying the mapping from required field names to the column names in your data file.
+\item{column_mappings}{Named list (optional). Specifies the mapping from required field names to the column names in your data file.
 If \code{NULL} and the dataset's columns do not match the expected columns, the user will be prompted interactively.
 The list should have the following keys: 'name', 'takeaway', 'text', 'vizType', 'viz', and 'alt'.
 If the 'text' column is missing, you can set it to \code{NA_character_} to handle it as optional.}
+
+\item{default_width}{Character (optional). Default width for embeds. Default is \code{"100\%"}.}
+
+\item{default_height_vertical}{Character (optional). Default height for vertical visualizations. Default is \code{"850px"}.}
+
+\item{default_height_similar}{Character (optional). Default height for similar visualizations. Default is \code{"650px"}.}
+
+\item{default_height_horizontal}{Character (optional). Default height for horizontal visualizations. Default is \code{"600px"}.}
 }
 \value{
 A list of panels, where each panel is a list containing:
 \describe{
-\item{name}{The panel's name.}
-\item{takeaway}{The main takeaway sentence for the panel.}
-\item{text}{Additional context or explanations for the panel. If empty or missing, it will be set to an empty string.}
-\item{vizType}{The type of visualization to include ("embed", "image-link", "image").}
-\item{viz}{The content of the visualization (embed code, external image link, or local image path). Figma design links
+\item{name}{Character. The panel's name.}
+\item{takeaway}{Character. The main takeaway sentence for the panel.}
+\item{text}{Character (optional). Additional context or explanations for the panel. If empty or missing, it will be set to an empty string.}
+\item{vizType}{Character. The type of visualization to include ("embed", "image-link", "image").}
+\item{viz}{Character. The content of the visualization (embed code, external image link, or local image path). Figma design links
 are transformed to prototype links.}
-\item{alt}{Alt text for the visualization, for accessibility purposes.}
+\item{alt}{Character (optional). Alt text for the visualization, for accessibility purposes.}
+\item{vizSpace}{Character (optional). Indicates the layout orientation of the visualization (\code{"horizontal"}, \code{"vertical"}, \code{"similar"}).}
 }
 }
 \description{
 This function allows the user to generate a list of panels from a CSV or XLSX file.
 If the column names in the data file do not match the required fields, and the user hasn't provided \code{column_mappings},
-the function will prompt the user to input the correct column names using \code{readline()}.
+the function will prompt the user to input the correct column names interactively.
 The function also supports various visualization types, transforming Figma embeds to the correct prototype format.
 }
 \examples{
@@ -41,7 +54,7 @@ The function also supports various visualization types, transforming Figma embed
 # Assuming the CSV file has columns named 'name', 'takeaway', 'text', 'vizType', 'viz', 'alt'
 panels <- create_panels_list("path/to/your/file.csv")
 
-# Example with a standard CSV file and no manual input (with automatic column mappings):
+# Example 2: Using custom column mappings
 panels <- create_panels_list('panels.csv', column_mappings = list(
   name = 'panel_name',
   takeaway = 'main_takeaway',
@@ -51,8 +64,7 @@ panels <- create_panels_list('panels.csv', column_mappings = list(
   alt = 'alt_text'
 ))
 
-# Example with an XLSX file and interactive prompt
-(requires user input if columns are not standard):
+# Example 3: Using an XLSX file with interactive prompts
 panels <- create_panels_list('panels.xlsx')
 }
 

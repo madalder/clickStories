@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateStory.R
 \name{create_story}
 \alias{create_story}
-\title{Generate Quarto Reveal.js Click-Through Data Stories}
+\title{Create a Quarto Reveal.js Click-Through Story}
 \usage{
 create_story(
   story_title,
@@ -17,81 +17,73 @@ create_story(
 )
 }
 \arguments{
-\item{story_title}{The title of the presentation.}
+\item{story_title}{Character. The title of the click through.}
 
-\item{subtitle}{The subtitle of the presentation (optional).}
+\item{subtitle}{Character (optional). Subtitle of the click through.}
 
-\item{output_dir}{The file path where you want the directory folder and other relevant files to be placed.}
+\item{output_dir}{Character (optional). Directory where the generated files (e.g., \code{.qmd}, images) will be stored.
+Defaults to the current working directory if NULL.}
 
-\item{name}{The file name you want to use for the generated directory folder and Quarto \code{.qmd} document. Default is "story".}
+\item{name}{Character. The base name for the generated \code{.qmd} file and output folder. Default is \code{"story"}.}
 
-\item{logo}{The path to the logo image. If provided, it will be copied to the "images" directory.}
+\item{logo}{Character (optional). Path to a logo image to be included in the click through. The logo will be copied to an \code{images} directory.}
 
-\item{style}{The path to a custom SCSS file for styling the presentation. If provided, it will be copied to the same directory as the \code{.qmd} file.}
+\item{style}{Character (optional). Path to a custom SCSS style file. If provided, it will be copied into the project directory and included in the click through.}
 
-\item{render_html}{Logical, if \code{TRUE}, the function will attempt to render the Quarto \code{.qmd} file into HTML after creation.}
+\item{render_html}{Logical. If \code{TRUE}, renders the \code{.qmd} file into an HTML click through. Default is \code{FALSE}.}
 
-\item{panels}{An optional named argument to pass panel definitions as a list. If \code{panels} is \code{NULL}, panels are collected from \code{...}. Each panel is defined as a list containing:
-\describe{
-\item{name}{A keyword or two (hyphenated) to use as the panel's URL when published.}
-\item{takeaway}{The main takeaway sentence that appears first for each panel.}
-\item{text}{Additional text to provide context or explanations for the panel.}
-\item{vizType}{The type of visualization to include in the second column. Possible values: "embed" (for embedding HTML content), "image-link" (for an external image), "image" (for a local image). If \code{"image"}, the local image will be copied to the "images" directory within the generated folder.}
-\item{viz}{The content of the visualization. It can be an HTML embed code, a link to an external image, or the path to a local image. For local images, the function will automatically copy the file to the "images" folder within the output directory.}
-\item{alt}{The alt text for the image or image-link, used for accessibility and image descriptions.}
+\item{panels}{List. A list of panels to include in the click through. Each panel should be a list containing the following fields:
+\itemize{
+\item \code{name}: Character. A unique identifier for the panel (used as a slide ID).
+\item \code{takeaway}: Character. The main message or headline for the panel.
+\item \code{text}: Character (optional). Additional context or supporting text.
+\item \code{vizType}: Character. The type of visualization. Supported values: \code{"embed"}, \code{"image-link"}, \code{"image"}, \code{"highchart"}.
+\item \code{viz}: Character. The visualization content. This can be HTML embed code, an external image URL, a local image path, or R code for Highcharts.
+\item \code{vizSpace}: Character. The layout orientation of the visualization (\code{"horizontal"}, \code{"vertical"}, \code{"similar"}).
+\item \code{alt}: Character (optional). Alt text for images, for accessibility.
 }}
 
-\item{...}{Additional panel definitions, if \code{panels} is not used. The structure for each panel is the same as described under the \code{panels} argument.}
+\item{...}{Additional panels passed directly as arguments instead of through the \code{panels} parameter.}
 }
 \value{
 A list containing:
-\describe{
-\item{qmd_file}{The file path to the generated Quarto \code{.qmd} file.}
-\item{html_file}{The file path to the generated HTML file (if \code{render_html = TRUE}), or \code{NULL} otherwise.}
+\itemize{
+\item \code{qmd_file}: Character. Path to the generated \code{.qmd} file.
+\item \code{html_file}: Character (optional). Path to the rendered HTML file if \code{render_html = TRUE}, or \code{NULL} otherwise.
 }
 }
 \description{
-This function generates a Quarto Reveal.js presentation with custom slides, including images, text, and visualizations.
-Each panel can have two columns: one for text and the other for a visualization, which can be an embedded HTML object, an external image, or a local image.
-You can include custom SCSS themes to style the presentation further. You can also opt to create a self-contained HTML file version of the story.
+This function generates a Quarto Reveal.js click through with dynamic layouts based on content length.
+It supports various visualization types and handles special cases like embed-only slides.
 }
 \examples{
 \dontrun{
+# Example usage
 create_story(
-  story_title = "Data Story Title",
-  subtitle = "A Subtitle for the Story",
-  logo = NULL,
-  output_dir = ".",
-  name = "story",
-  style = NULL,
-  render_html = FALSE,
+  story_title = "Sample click through story",
+  subtitle = "An Example of Dynamic Layouts",
+  output_dir = "output",
+  name = "example_story",
   panels = list(
     list(
-      name = "keyword1",
-      takeaway = "This is the Main Takeaway of the panel.",
-      text = "This is additional text that gives the reader additional context.",
-      vizType = "embed",
-      viz = '<div class="flourish-embed flourish-chart"
-      data-src="visualisation/11597006"><script src=
-      "https://public.flourish.studio/resources/embed.js"></script></div>'
-    ),
-    list(
-      name = "keyword2",
-      takeaway = "New panel, new main takeaway, summary sentence, etc.",
-      text = "This is more text that gives the reader additional context.",
-      vizType = "image-link",
-      viz = "https://www.naccho.org/uploads/body-images/public-health-101-infographic-no-logo.jpg",
-      alt = "This is the alt text description for the shared image link"
-    ),
-    list(
-      name = "keyword3",
-      takeaway = "New panel, new main takeaway, summary sentence, etc.",
-      text = "This is more text that gives the reader additional context.",
+      name = "slide1",
+      takeaway = "Key Insight 1",
+      text = "Supporting details for insight 1.",
       vizType = "image",
-      viz = "images/test.png",
-      alt = "The alt text for the associated image."
+      viz = "path/to/image.png",
+      vizSpace = "horizontal",
+      alt = "Description of the image"
+    ),
+    list(
+      name = "slide2",
+      takeaway = "Key Insight 2",
+      text = "Additional context for insight 2.",
+      vizType = "embed",
+      viz = "<iframe src='https://example.com' />",
+      vizSpace = "vertical"
     )
-  )
+  ),
+  render_html = TRUE
 )
 }
 }

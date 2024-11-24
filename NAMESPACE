@@ -2,9 +2,9 @@
 
 export(create_panels_list)
 export(create_story)
+export(generate_figma_embed_value)
 import(fs)
 import(glue)
-import(quarto)
 importFrom(readxl,read_xlsx)
 importFrom(stats,setNames)
 importFrom(tools,file_ext)
