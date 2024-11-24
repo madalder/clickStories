@@ -186,19 +186,25 @@ create_panels_list <- function(file, column_mappings = NULL,
 
     # Prompt for missing vizSpace
     if (is.na(viz_space) || viz_space == "") {
+      cat(glue::glue(
+        "\nFor the panel '{panel_data[[column_mappings$name]][i]}', how does the visualization fit best?\n",
+        "  1. Horizontally wide\n",
+        "  2. Vertically tall\n",
+        "  3. Both dimensions are similar\n"
+      ))
+
       repeat {
-        viz_space_input <- readline(glue::glue(
-          "Does the '{panel_data[[column_mappings$name]][i]}' panel visualization take up noticeably more space\n (1) horizontally, \n (2) vertically, or are both dimensions \n (3) fairly similar?: "
-        ))
+        viz_space_input <- readline("Enter 1, 2, or 3: ")
         if (viz_space_input %in% c("1", "2", "3")) {
           viz_space <- switch(viz_space_input, "1" = "horizontal", "2" = "vertical", "3" = "similar")
+          panel_data[[column_mappings$vizSpace]][i] <- viz_space
           break
         } else {
-          cat("Invalid input. Please enter 1 for horizontal, 2 for vertical, or 3 if both dimensions are similar.\n")
+          cat("Invalid input. Please enter 1, 2, or 3.\n")
         }
       }
-      panel_data[[column_mappings$vizSpace]][i] <- viz_space
     }
+
 
     # Handle Figma embeds
     if (grepl("<iframe", viz_entry) && grepl("embed.figma.com", viz_entry)) {
