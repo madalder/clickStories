@@ -78,7 +78,7 @@ generate_figma_embed_value <- function(embed_code) {
 #'   \item{name}{Character. The panel's name.}
 #'   \item{takeaway}{Character. The main takeaway sentence for the panel.}
 #'   \item{text}{Character (optional). Additional context or explanations for the panel. If empty or missing, it will be set to an empty string.}
-#'   \item{vizType}{Character. The type of visualization to include ("embed", "image-link", "image").}
+#'   \item{vizType}{Character. The type of visualization to include ("embed", "image-link", "image", "highchart").}
 #'   \item{viz}{Character. The content of the visualization (embed code, external image link, or local image path). Figma design links
 #'              are transformed to prototype links.}
 #'   \item{alt}{Character (optional). Alt text for the visualization, for accessibility purposes.}
