@@ -2,6 +2,7 @@
 
 export(create_panels_list)
 export(create_story)
+export(download_clickStories_template)
 export(generate_figma_embed_value)
 import(fs)
 import(glue)

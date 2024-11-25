@@ -12,6 +12,7 @@
 #'
 #' # Get the file path within the package
 #' download_clickStories_template()
+#' @export
 download_clickStories_template <- function(destfile = NULL, overwrite = FALSE) {
   # Locate the file in the package
   template_path <- system.file("extdata", "clickStories_template.xlsx", package = "clickStories")
